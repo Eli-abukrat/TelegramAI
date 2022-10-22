@@ -4,7 +4,6 @@ from loguru import logger
 
 
 class Bot:
-
     def __init__(self, token):
         self.bot = telebot.TeleBot(token, threaded=False)
         self.bot.set_update_listener(self._bot_internal_handler)
@@ -60,8 +59,14 @@ class QuoteBot(Bot):
             self.send_text_with_quote(message.text, message_id=message.message_id)
 
 
-class YoutubeBot(Bot):
-    pass
+class Bot(Bot):
+    def handle_message(self, message):
+        if self.is_current_msg_photo():
+            self.download_user_photo(quality=3)
+            return
+
+        video = search_download_youtube_video(message.text)
+        self.send_text(video[0].get("url"))
 
 
 if __name__ == '__main__':
